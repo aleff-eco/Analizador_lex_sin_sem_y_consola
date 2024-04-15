@@ -6,7 +6,7 @@ Rule 0     S' -> declaraciones
 Rule 1     declaraciones -> declaracion declaraciones
 Rule 2     declaraciones -> declaracion
 Rule 3     declaracion -> VAR VARIABLE igual NUMERO Punto_y_coma
-Rule 4     declaracion -> VAR VARIABLE igual COMILLA VARIABLE COMILLA Punto_y_coma
+Rule 4     declaracion -> VAR VARIABLE igual expresion_parentesis Punto_y_coma
 Rule 5     declaracion -> VAR VARIABLE igual TRUE Punto_y_coma
 Rule 6     declaracion -> VAR VARIABLE igual FALSE Punto_y_coma
 Rule 7     declaracion -> IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones
@@ -33,7 +33,7 @@ Rule 27    expresion -> VARIABLE
 
 Terminals, with rules where they appear
 
-COMILLA              : 4 4 14 14
+COMILLA              : 14 14
 DEF                  : 22 23
 Dos_puntos           : 7 8 9 10 11 12 22 23
 FALSE                : 6
@@ -52,7 +52,7 @@ Punto_y_coma         : 3 4 5 6 13 20 21
 RANGE                : 12
 TRUE                 : 5
 VAR                  : 3 4 5 6
-VARIABLE             : 3 4 4 5 6 12 16 18 20 21 22 23 27
+VARIABLE             : 3 4 5 6 12 16 18 20 21 22 23 27
 coma                 : 25
 error                : 
 igual                : 3 4 5 6
@@ -63,7 +63,7 @@ Nonterminals, with rules where they appear
 declaracion          : 1 2
 declaraciones        : 1 7 8 9 10 11 12 22 0
 expresion            : 24 25
-expresion_parentesis : 13
+expresion_parentesis : 4 13
 parametros           : 21 22 25
 variables            : 14 15 18 19
 
@@ -75,7 +75,7 @@ state 0
     (1) declaraciones -> . declaracion declaraciones
     (2) declaraciones -> . declaracion
     (3) declaracion -> . VAR VARIABLE igual NUMERO Punto_y_coma
-    (4) declaracion -> . VAR VARIABLE igual COMILLA VARIABLE COMILLA Punto_y_coma
+    (4) declaracion -> . VAR VARIABLE igual expresion_parentesis Punto_y_coma
     (5) declaracion -> . VAR VARIABLE igual TRUE Punto_y_coma
     (6) declaracion -> . VAR VARIABLE igual FALSE Punto_y_coma
     (7) declaracion -> . IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones
@@ -113,7 +113,7 @@ state 2
     (1) declaraciones -> . declaracion declaraciones
     (2) declaraciones -> . declaracion
     (3) declaracion -> . VAR VARIABLE igual NUMERO Punto_y_coma
-    (4) declaracion -> . VAR VARIABLE igual COMILLA VARIABLE COMILLA Punto_y_coma
+    (4) declaracion -> . VAR VARIABLE igual expresion_parentesis Punto_y_coma
     (5) declaracion -> . VAR VARIABLE igual TRUE Punto_y_coma
     (6) declaracion -> . VAR VARIABLE igual FALSE Punto_y_coma
     (7) declaracion -> . IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones
@@ -155,7 +155,7 @@ state 2
 state 3
 
     (3) declaracion -> VAR . VARIABLE igual NUMERO Punto_y_coma
-    (4) declaracion -> VAR . VARIABLE igual COMILLA VARIABLE COMILLA Punto_y_coma
+    (4) declaracion -> VAR . VARIABLE igual expresion_parentesis Punto_y_coma
     (5) declaracion -> VAR . VARIABLE igual TRUE Punto_y_coma
     (6) declaracion -> VAR . VARIABLE igual FALSE Punto_y_coma
 
@@ -219,7 +219,7 @@ state 9
 state 10
 
     (3) declaracion -> VAR VARIABLE . igual NUMERO Punto_y_coma
-    (4) declaracion -> VAR VARIABLE . igual COMILLA VARIABLE COMILLA Punto_y_coma
+    (4) declaracion -> VAR VARIABLE . igual expresion_parentesis Punto_y_coma
     (5) declaracion -> VAR VARIABLE . igual TRUE Punto_y_coma
     (6) declaracion -> VAR VARIABLE . igual FALSE Punto_y_coma
 
@@ -292,15 +292,24 @@ state 15
 state 16
 
     (3) declaracion -> VAR VARIABLE igual . NUMERO Punto_y_coma
-    (4) declaracion -> VAR VARIABLE igual . COMILLA VARIABLE COMILLA Punto_y_coma
+    (4) declaracion -> VAR VARIABLE igual . expresion_parentesis Punto_y_coma
     (5) declaracion -> VAR VARIABLE igual . TRUE Punto_y_coma
     (6) declaracion -> VAR VARIABLE igual . FALSE Punto_y_coma
+    (14) expresion_parentesis -> . COMILLA variables COMILLA
+    (15) expresion_parentesis -> . variables
+    (16) variables -> . VARIABLE
+    (17) variables -> . NUMERO
+    (18) variables -> . variables VARIABLE
+    (19) variables -> . variables NUMERO
 
     NUMERO          shift and go to state 34
-    COMILLA         shift and go to state 35
     TRUE            shift and go to state 36
     FALSE           shift and go to state 37
+    COMILLA         shift and go to state 29
+    VARIABLE        shift and go to state 31
 
+    expresion_parentesis           shift and go to state 35
+    variables                      shift and go to state 30
 
 state 17
 
@@ -410,6 +419,7 @@ state 30
     (19) variables -> variables . NUMERO
 
     Parentesis_final reduce using rule 15 (expresion_parentesis -> variables .)
+    Punto_y_coma    reduce using rule 15 (expresion_parentesis -> variables .)
     VARIABLE        shift and go to state 49
     NUMERO          shift and go to state 50
 
@@ -421,6 +431,7 @@ state 31
     VARIABLE        reduce using rule 16 (variables -> VARIABLE .)
     NUMERO          reduce using rule 16 (variables -> VARIABLE .)
     Parentesis_final reduce using rule 16 (variables -> VARIABLE .)
+    Punto_y_coma    reduce using rule 16 (variables -> VARIABLE .)
     COMILLA         reduce using rule 16 (variables -> VARIABLE .)
 
 
@@ -453,15 +464,21 @@ state 33
 state 34
 
     (3) declaracion -> VAR VARIABLE igual NUMERO . Punto_y_coma
+    (17) variables -> NUMERO .
 
+  ! shift/reduce conflict for Punto_y_coma resolved as shift
     Punto_y_coma    shift and go to state 53
+    VARIABLE        reduce using rule 17 (variables -> NUMERO .)
+    NUMERO          reduce using rule 17 (variables -> NUMERO .)
+
+  ! Punto_y_coma    [ reduce using rule 17 (variables -> NUMERO .) ]
 
 
 state 35
 
-    (4) declaracion -> VAR VARIABLE igual COMILLA . VARIABLE COMILLA Punto_y_coma
+    (4) declaracion -> VAR VARIABLE igual expresion_parentesis . Punto_y_coma
 
-    VARIABLE        shift and go to state 54
+    Punto_y_coma    shift and go to state 54
 
 
 state 36
@@ -579,6 +596,7 @@ state 49
     VARIABLE        reduce using rule 18 (variables -> variables VARIABLE .)
     NUMERO          reduce using rule 18 (variables -> variables VARIABLE .)
     Parentesis_final reduce using rule 18 (variables -> variables VARIABLE .)
+    Punto_y_coma    reduce using rule 18 (variables -> variables VARIABLE .)
     COMILLA         reduce using rule 18 (variables -> variables VARIABLE .)
 
 
@@ -589,6 +607,7 @@ state 50
     VARIABLE        reduce using rule 19 (variables -> variables NUMERO .)
     NUMERO          reduce using rule 19 (variables -> variables NUMERO .)
     Parentesis_final reduce using rule 19 (variables -> variables NUMERO .)
+    Punto_y_coma    reduce using rule 19 (variables -> variables NUMERO .)
     COMILLA         reduce using rule 19 (variables -> variables NUMERO .)
 
 
@@ -621,9 +640,15 @@ state 53
 
 state 54
 
-    (4) declaracion -> VAR VARIABLE igual COMILLA VARIABLE . COMILLA Punto_y_coma
+    (4) declaracion -> VAR VARIABLE igual expresion_parentesis Punto_y_coma .
 
-    COMILLA         shift and go to state 69
+    VAR             reduce using rule 4 (declaracion -> VAR VARIABLE igual expresion_parentesis Punto_y_coma .)
+    IF              reduce using rule 4 (declaracion -> VAR VARIABLE igual expresion_parentesis Punto_y_coma .)
+    FOR             reduce using rule 4 (declaracion -> VAR VARIABLE igual expresion_parentesis Punto_y_coma .)
+    PRINT           reduce using rule 4 (declaracion -> VAR VARIABLE igual expresion_parentesis Punto_y_coma .)
+    VARIABLE        reduce using rule 4 (declaracion -> VAR VARIABLE igual expresion_parentesis Punto_y_coma .)
+    DEF             reduce using rule 4 (declaracion -> VAR VARIABLE igual expresion_parentesis Punto_y_coma .)
+    $end            reduce using rule 4 (declaracion -> VAR VARIABLE igual expresion_parentesis Punto_y_coma .)
 
 
 state 55
@@ -678,7 +703,38 @@ state 59
     (1) declaraciones -> . declaracion declaraciones
     (2) declaraciones -> . declaracion
     (3) declaracion -> . VAR VARIABLE igual NUMERO Punto_y_coma
-    (4) declaracion -> . VAR VARIABLE igual COMILLA VARIABLE COMILLA Punto_y_coma
+    (4) declaracion -> . VAR VARIABLE igual expresion_parentesis Punto_y_coma
+    (5) declaracion -> . VAR VARIABLE igual TRUE Punto_y_coma
+    (6) declaracion -> . VAR VARIABLE igual FALSE Punto_y_coma
+    (7) declaracion -> . IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones
+    (8) declaracion -> . IF NUMERO Menor_que NUMERO Dos_puntos declaraciones
+    (9) declaracion -> . IF NUMERO Menor_o_igual NUMERO Dos_puntos declaraciones
+    (10) declaracion -> . IF NUMERO Mayor_o_igual NUMERO Dos_puntos declaraciones
+    (11) declaracion -> . IF NUMERO igual_igual NUMERO Dos_puntos declaraciones
+    (12) declaracion -> . FOR VARIABLE IN RANGE Parentesis_apertura NUMERO Parentesis_final Dos_puntos declaraciones
+    (13) declaracion -> . PRINT Parentesis_apertura expresion_parentesis Parentesis_final Punto_y_coma
+    (20) declaracion -> . VARIABLE Parentesis_apertura Parentesis_final Punto_y_coma
+    (21) declaracion -> . VARIABLE Parentesis_apertura parametros Parentesis_final Punto_y_coma
+    (22) declaracion -> . DEF VARIABLE Parentesis_apertura parametros Parentesis_final Dos_puntos declaraciones
+    (23) declaracion -> . DEF VARIABLE Parentesis_apertura Parentesis_final Dos_puntos
+
+    VAR             shift and go to state 3
+    IF              shift and go to state 5
+    FOR             shift and go to state 6
+    PRINT           shift and go to state 7
+    VARIABLE        shift and go to state 4
+    DEF             shift and go to state 8
+
+    declaraciones                  shift and go to state 69
+    declaracion                    shift and go to state 2
+
+state 60
+
+    (8) declaracion -> IF NUMERO Menor_que NUMERO Dos_puntos . declaraciones
+    (1) declaraciones -> . declaracion declaraciones
+    (2) declaraciones -> . declaracion
+    (3) declaracion -> . VAR VARIABLE igual NUMERO Punto_y_coma
+    (4) declaracion -> . VAR VARIABLE igual expresion_parentesis Punto_y_coma
     (5) declaracion -> . VAR VARIABLE igual TRUE Punto_y_coma
     (6) declaracion -> . VAR VARIABLE igual FALSE Punto_y_coma
     (7) declaracion -> . IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones
@@ -703,13 +759,13 @@ state 59
     declaraciones                  shift and go to state 70
     declaracion                    shift and go to state 2
 
-state 60
+state 61
 
-    (8) declaracion -> IF NUMERO Menor_que NUMERO Dos_puntos . declaraciones
+    (9) declaracion -> IF NUMERO Menor_o_igual NUMERO Dos_puntos . declaraciones
     (1) declaraciones -> . declaracion declaraciones
     (2) declaraciones -> . declaracion
     (3) declaracion -> . VAR VARIABLE igual NUMERO Punto_y_coma
-    (4) declaracion -> . VAR VARIABLE igual COMILLA VARIABLE COMILLA Punto_y_coma
+    (4) declaracion -> . VAR VARIABLE igual expresion_parentesis Punto_y_coma
     (5) declaracion -> . VAR VARIABLE igual TRUE Punto_y_coma
     (6) declaracion -> . VAR VARIABLE igual FALSE Punto_y_coma
     (7) declaracion -> . IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones
@@ -734,13 +790,13 @@ state 60
     declaraciones                  shift and go to state 71
     declaracion                    shift and go to state 2
 
-state 61
+state 62
 
-    (9) declaracion -> IF NUMERO Menor_o_igual NUMERO Dos_puntos . declaraciones
+    (10) declaracion -> IF NUMERO Mayor_o_igual NUMERO Dos_puntos . declaraciones
     (1) declaraciones -> . declaracion declaraciones
     (2) declaraciones -> . declaracion
     (3) declaracion -> . VAR VARIABLE igual NUMERO Punto_y_coma
-    (4) declaracion -> . VAR VARIABLE igual COMILLA VARIABLE COMILLA Punto_y_coma
+    (4) declaracion -> . VAR VARIABLE igual expresion_parentesis Punto_y_coma
     (5) declaracion -> . VAR VARIABLE igual TRUE Punto_y_coma
     (6) declaracion -> . VAR VARIABLE igual FALSE Punto_y_coma
     (7) declaracion -> . IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones
@@ -765,13 +821,13 @@ state 61
     declaraciones                  shift and go to state 72
     declaracion                    shift and go to state 2
 
-state 62
+state 63
 
-    (10) declaracion -> IF NUMERO Mayor_o_igual NUMERO Dos_puntos . declaraciones
+    (11) declaracion -> IF NUMERO igual_igual NUMERO Dos_puntos . declaraciones
     (1) declaraciones -> . declaracion declaraciones
     (2) declaraciones -> . declaracion
     (3) declaracion -> . VAR VARIABLE igual NUMERO Punto_y_coma
-    (4) declaracion -> . VAR VARIABLE igual COMILLA VARIABLE COMILLA Punto_y_coma
+    (4) declaracion -> . VAR VARIABLE igual expresion_parentesis Punto_y_coma
     (5) declaracion -> . VAR VARIABLE igual TRUE Punto_y_coma
     (6) declaracion -> . VAR VARIABLE igual FALSE Punto_y_coma
     (7) declaracion -> . IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones
@@ -796,13 +852,133 @@ state 62
     declaraciones                  shift and go to state 73
     declaracion                    shift and go to state 2
 
-state 63
+state 64
 
-    (11) declaracion -> IF NUMERO igual_igual NUMERO Dos_puntos . declaraciones
+    (12) declaracion -> FOR VARIABLE IN RANGE Parentesis_apertura . NUMERO Parentesis_final Dos_puntos declaraciones
+
+    NUMERO          shift and go to state 74
+
+
+state 65
+
+    (13) declaracion -> PRINT Parentesis_apertura expresion_parentesis Parentesis_final Punto_y_coma .
+
+    VAR             reduce using rule 13 (declaracion -> PRINT Parentesis_apertura expresion_parentesis Parentesis_final Punto_y_coma .)
+    IF              reduce using rule 13 (declaracion -> PRINT Parentesis_apertura expresion_parentesis Parentesis_final Punto_y_coma .)
+    FOR             reduce using rule 13 (declaracion -> PRINT Parentesis_apertura expresion_parentesis Parentesis_final Punto_y_coma .)
+    PRINT           reduce using rule 13 (declaracion -> PRINT Parentesis_apertura expresion_parentesis Parentesis_final Punto_y_coma .)
+    VARIABLE        reduce using rule 13 (declaracion -> PRINT Parentesis_apertura expresion_parentesis Parentesis_final Punto_y_coma .)
+    DEF             reduce using rule 13 (declaracion -> PRINT Parentesis_apertura expresion_parentesis Parentesis_final Punto_y_coma .)
+    $end            reduce using rule 13 (declaracion -> PRINT Parentesis_apertura expresion_parentesis Parentesis_final Punto_y_coma .)
+
+
+state 66
+
+    (14) expresion_parentesis -> COMILLA variables COMILLA .
+
+    Parentesis_final reduce using rule 14 (expresion_parentesis -> COMILLA variables COMILLA .)
+    Punto_y_coma    reduce using rule 14 (expresion_parentesis -> COMILLA variables COMILLA .)
+
+
+state 67
+
+    (22) declaracion -> DEF VARIABLE Parentesis_apertura parametros Parentesis_final . Dos_puntos declaraciones
+
+    Dos_puntos      shift and go to state 75
+
+
+state 68
+
+    (23) declaracion -> DEF VARIABLE Parentesis_apertura Parentesis_final Dos_puntos .
+
+    VAR             reduce using rule 23 (declaracion -> DEF VARIABLE Parentesis_apertura Parentesis_final Dos_puntos .)
+    IF              reduce using rule 23 (declaracion -> DEF VARIABLE Parentesis_apertura Parentesis_final Dos_puntos .)
+    FOR             reduce using rule 23 (declaracion -> DEF VARIABLE Parentesis_apertura Parentesis_final Dos_puntos .)
+    PRINT           reduce using rule 23 (declaracion -> DEF VARIABLE Parentesis_apertura Parentesis_final Dos_puntos .)
+    VARIABLE        reduce using rule 23 (declaracion -> DEF VARIABLE Parentesis_apertura Parentesis_final Dos_puntos .)
+    DEF             reduce using rule 23 (declaracion -> DEF VARIABLE Parentesis_apertura Parentesis_final Dos_puntos .)
+    $end            reduce using rule 23 (declaracion -> DEF VARIABLE Parentesis_apertura Parentesis_final Dos_puntos .)
+
+
+state 69
+
+    (7) declaracion -> IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones .
+
+    VAR             reduce using rule 7 (declaracion -> IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones .)
+    IF              reduce using rule 7 (declaracion -> IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones .)
+    FOR             reduce using rule 7 (declaracion -> IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones .)
+    PRINT           reduce using rule 7 (declaracion -> IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones .)
+    VARIABLE        reduce using rule 7 (declaracion -> IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones .)
+    DEF             reduce using rule 7 (declaracion -> IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones .)
+    $end            reduce using rule 7 (declaracion -> IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones .)
+
+
+state 70
+
+    (8) declaracion -> IF NUMERO Menor_que NUMERO Dos_puntos declaraciones .
+
+    VAR             reduce using rule 8 (declaracion -> IF NUMERO Menor_que NUMERO Dos_puntos declaraciones .)
+    IF              reduce using rule 8 (declaracion -> IF NUMERO Menor_que NUMERO Dos_puntos declaraciones .)
+    FOR             reduce using rule 8 (declaracion -> IF NUMERO Menor_que NUMERO Dos_puntos declaraciones .)
+    PRINT           reduce using rule 8 (declaracion -> IF NUMERO Menor_que NUMERO Dos_puntos declaraciones .)
+    VARIABLE        reduce using rule 8 (declaracion -> IF NUMERO Menor_que NUMERO Dos_puntos declaraciones .)
+    DEF             reduce using rule 8 (declaracion -> IF NUMERO Menor_que NUMERO Dos_puntos declaraciones .)
+    $end            reduce using rule 8 (declaracion -> IF NUMERO Menor_que NUMERO Dos_puntos declaraciones .)
+
+
+state 71
+
+    (9) declaracion -> IF NUMERO Menor_o_igual NUMERO Dos_puntos declaraciones .
+
+    VAR             reduce using rule 9 (declaracion -> IF NUMERO Menor_o_igual NUMERO Dos_puntos declaraciones .)
+    IF              reduce using rule 9 (declaracion -> IF NUMERO Menor_o_igual NUMERO Dos_puntos declaraciones .)
+    FOR             reduce using rule 9 (declaracion -> IF NUMERO Menor_o_igual NUMERO Dos_puntos declaraciones .)
+    PRINT           reduce using rule 9 (declaracion -> IF NUMERO Menor_o_igual NUMERO Dos_puntos declaraciones .)
+    VARIABLE        reduce using rule 9 (declaracion -> IF NUMERO Menor_o_igual NUMERO Dos_puntos declaraciones .)
+    DEF             reduce using rule 9 (declaracion -> IF NUMERO Menor_o_igual NUMERO Dos_puntos declaraciones .)
+    $end            reduce using rule 9 (declaracion -> IF NUMERO Menor_o_igual NUMERO Dos_puntos declaraciones .)
+
+
+state 72
+
+    (10) declaracion -> IF NUMERO Mayor_o_igual NUMERO Dos_puntos declaraciones .
+
+    VAR             reduce using rule 10 (declaracion -> IF NUMERO Mayor_o_igual NUMERO Dos_puntos declaraciones .)
+    IF              reduce using rule 10 (declaracion -> IF NUMERO Mayor_o_igual NUMERO Dos_puntos declaraciones .)
+    FOR             reduce using rule 10 (declaracion -> IF NUMERO Mayor_o_igual NUMERO Dos_puntos declaraciones .)
+    PRINT           reduce using rule 10 (declaracion -> IF NUMERO Mayor_o_igual NUMERO Dos_puntos declaraciones .)
+    VARIABLE        reduce using rule 10 (declaracion -> IF NUMERO Mayor_o_igual NUMERO Dos_puntos declaraciones .)
+    DEF             reduce using rule 10 (declaracion -> IF NUMERO Mayor_o_igual NUMERO Dos_puntos declaraciones .)
+    $end            reduce using rule 10 (declaracion -> IF NUMERO Mayor_o_igual NUMERO Dos_puntos declaraciones .)
+
+
+state 73
+
+    (11) declaracion -> IF NUMERO igual_igual NUMERO Dos_puntos declaraciones .
+
+    VAR             reduce using rule 11 (declaracion -> IF NUMERO igual_igual NUMERO Dos_puntos declaraciones .)
+    IF              reduce using rule 11 (declaracion -> IF NUMERO igual_igual NUMERO Dos_puntos declaraciones .)
+    FOR             reduce using rule 11 (declaracion -> IF NUMERO igual_igual NUMERO Dos_puntos declaraciones .)
+    PRINT           reduce using rule 11 (declaracion -> IF NUMERO igual_igual NUMERO Dos_puntos declaraciones .)
+    VARIABLE        reduce using rule 11 (declaracion -> IF NUMERO igual_igual NUMERO Dos_puntos declaraciones .)
+    DEF             reduce using rule 11 (declaracion -> IF NUMERO igual_igual NUMERO Dos_puntos declaraciones .)
+    $end            reduce using rule 11 (declaracion -> IF NUMERO igual_igual NUMERO Dos_puntos declaraciones .)
+
+
+state 74
+
+    (12) declaracion -> FOR VARIABLE IN RANGE Parentesis_apertura NUMERO . Parentesis_final Dos_puntos declaraciones
+
+    Parentesis_final shift and go to state 76
+
+
+state 75
+
+    (22) declaracion -> DEF VARIABLE Parentesis_apertura parametros Parentesis_final Dos_puntos . declaraciones
     (1) declaraciones -> . declaracion declaraciones
     (2) declaraciones -> . declaracion
     (3) declaracion -> . VAR VARIABLE igual NUMERO Punto_y_coma
-    (4) declaracion -> . VAR VARIABLE igual COMILLA VARIABLE COMILLA Punto_y_coma
+    (4) declaracion -> . VAR VARIABLE igual expresion_parentesis Punto_y_coma
     (5) declaracion -> . VAR VARIABLE igual TRUE Punto_y_coma
     (6) declaracion -> . VAR VARIABLE igual FALSE Punto_y_coma
     (7) declaracion -> . IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones
@@ -824,142 +1000,36 @@ state 63
     VARIABLE        shift and go to state 4
     DEF             shift and go to state 8
 
-    declaraciones                  shift and go to state 74
+    declaraciones                  shift and go to state 77
     declaracion                    shift and go to state 2
-
-state 64
-
-    (12) declaracion -> FOR VARIABLE IN RANGE Parentesis_apertura . NUMERO Parentesis_final Dos_puntos declaraciones
-
-    NUMERO          shift and go to state 75
-
-
-state 65
-
-    (13) declaracion -> PRINT Parentesis_apertura expresion_parentesis Parentesis_final Punto_y_coma .
-
-    VAR             reduce using rule 13 (declaracion -> PRINT Parentesis_apertura expresion_parentesis Parentesis_final Punto_y_coma .)
-    IF              reduce using rule 13 (declaracion -> PRINT Parentesis_apertura expresion_parentesis Parentesis_final Punto_y_coma .)
-    FOR             reduce using rule 13 (declaracion -> PRINT Parentesis_apertura expresion_parentesis Parentesis_final Punto_y_coma .)
-    PRINT           reduce using rule 13 (declaracion -> PRINT Parentesis_apertura expresion_parentesis Parentesis_final Punto_y_coma .)
-    VARIABLE        reduce using rule 13 (declaracion -> PRINT Parentesis_apertura expresion_parentesis Parentesis_final Punto_y_coma .)
-    DEF             reduce using rule 13 (declaracion -> PRINT Parentesis_apertura expresion_parentesis Parentesis_final Punto_y_coma .)
-    $end            reduce using rule 13 (declaracion -> PRINT Parentesis_apertura expresion_parentesis Parentesis_final Punto_y_coma .)
-
-
-state 66
-
-    (14) expresion_parentesis -> COMILLA variables COMILLA .
-
-    Parentesis_final reduce using rule 14 (expresion_parentesis -> COMILLA variables COMILLA .)
-
-
-state 67
-
-    (22) declaracion -> DEF VARIABLE Parentesis_apertura parametros Parentesis_final . Dos_puntos declaraciones
-
-    Dos_puntos      shift and go to state 76
-
-
-state 68
-
-    (23) declaracion -> DEF VARIABLE Parentesis_apertura Parentesis_final Dos_puntos .
-
-    VAR             reduce using rule 23 (declaracion -> DEF VARIABLE Parentesis_apertura Parentesis_final Dos_puntos .)
-    IF              reduce using rule 23 (declaracion -> DEF VARIABLE Parentesis_apertura Parentesis_final Dos_puntos .)
-    FOR             reduce using rule 23 (declaracion -> DEF VARIABLE Parentesis_apertura Parentesis_final Dos_puntos .)
-    PRINT           reduce using rule 23 (declaracion -> DEF VARIABLE Parentesis_apertura Parentesis_final Dos_puntos .)
-    VARIABLE        reduce using rule 23 (declaracion -> DEF VARIABLE Parentesis_apertura Parentesis_final Dos_puntos .)
-    DEF             reduce using rule 23 (declaracion -> DEF VARIABLE Parentesis_apertura Parentesis_final Dos_puntos .)
-    $end            reduce using rule 23 (declaracion -> DEF VARIABLE Parentesis_apertura Parentesis_final Dos_puntos .)
-
-
-state 69
-
-    (4) declaracion -> VAR VARIABLE igual COMILLA VARIABLE COMILLA . Punto_y_coma
-
-    Punto_y_coma    shift and go to state 77
-
-
-state 70
-
-    (7) declaracion -> IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones .
-
-    VAR             reduce using rule 7 (declaracion -> IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones .)
-    IF              reduce using rule 7 (declaracion -> IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones .)
-    FOR             reduce using rule 7 (declaracion -> IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones .)
-    PRINT           reduce using rule 7 (declaracion -> IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones .)
-    VARIABLE        reduce using rule 7 (declaracion -> IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones .)
-    DEF             reduce using rule 7 (declaracion -> IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones .)
-    $end            reduce using rule 7 (declaracion -> IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones .)
-
-
-state 71
-
-    (8) declaracion -> IF NUMERO Menor_que NUMERO Dos_puntos declaraciones .
-
-    VAR             reduce using rule 8 (declaracion -> IF NUMERO Menor_que NUMERO Dos_puntos declaraciones .)
-    IF              reduce using rule 8 (declaracion -> IF NUMERO Menor_que NUMERO Dos_puntos declaraciones .)
-    FOR             reduce using rule 8 (declaracion -> IF NUMERO Menor_que NUMERO Dos_puntos declaraciones .)
-    PRINT           reduce using rule 8 (declaracion -> IF NUMERO Menor_que NUMERO Dos_puntos declaraciones .)
-    VARIABLE        reduce using rule 8 (declaracion -> IF NUMERO Menor_que NUMERO Dos_puntos declaraciones .)
-    DEF             reduce using rule 8 (declaracion -> IF NUMERO Menor_que NUMERO Dos_puntos declaraciones .)
-    $end            reduce using rule 8 (declaracion -> IF NUMERO Menor_que NUMERO Dos_puntos declaraciones .)
-
-
-state 72
-
-    (9) declaracion -> IF NUMERO Menor_o_igual NUMERO Dos_puntos declaraciones .
-
-    VAR             reduce using rule 9 (declaracion -> IF NUMERO Menor_o_igual NUMERO Dos_puntos declaraciones .)
-    IF              reduce using rule 9 (declaracion -> IF NUMERO Menor_o_igual NUMERO Dos_puntos declaraciones .)
-    FOR             reduce using rule 9 (declaracion -> IF NUMERO Menor_o_igual NUMERO Dos_puntos declaraciones .)
-    PRINT           reduce using rule 9 (declaracion -> IF NUMERO Menor_o_igual NUMERO Dos_puntos declaraciones .)
-    VARIABLE        reduce using rule 9 (declaracion -> IF NUMERO Menor_o_igual NUMERO Dos_puntos declaraciones .)
-    DEF             reduce using rule 9 (declaracion -> IF NUMERO Menor_o_igual NUMERO Dos_puntos declaraciones .)
-    $end            reduce using rule 9 (declaracion -> IF NUMERO Menor_o_igual NUMERO Dos_puntos declaraciones .)
-
-
-state 73
-
-    (10) declaracion -> IF NUMERO Mayor_o_igual NUMERO Dos_puntos declaraciones .
-
-    VAR             reduce using rule 10 (declaracion -> IF NUMERO Mayor_o_igual NUMERO Dos_puntos declaraciones .)
-    IF              reduce using rule 10 (declaracion -> IF NUMERO Mayor_o_igual NUMERO Dos_puntos declaraciones .)
-    FOR             reduce using rule 10 (declaracion -> IF NUMERO Mayor_o_igual NUMERO Dos_puntos declaraciones .)
-    PRINT           reduce using rule 10 (declaracion -> IF NUMERO Mayor_o_igual NUMERO Dos_puntos declaraciones .)
-    VARIABLE        reduce using rule 10 (declaracion -> IF NUMERO Mayor_o_igual NUMERO Dos_puntos declaraciones .)
-    DEF             reduce using rule 10 (declaracion -> IF NUMERO Mayor_o_igual NUMERO Dos_puntos declaraciones .)
-    $end            reduce using rule 10 (declaracion -> IF NUMERO Mayor_o_igual NUMERO Dos_puntos declaraciones .)
-
-
-state 74
-
-    (11) declaracion -> IF NUMERO igual_igual NUMERO Dos_puntos declaraciones .
-
-    VAR             reduce using rule 11 (declaracion -> IF NUMERO igual_igual NUMERO Dos_puntos declaraciones .)
-    IF              reduce using rule 11 (declaracion -> IF NUMERO igual_igual NUMERO Dos_puntos declaraciones .)
-    FOR             reduce using rule 11 (declaracion -> IF NUMERO igual_igual NUMERO Dos_puntos declaraciones .)
-    PRINT           reduce using rule 11 (declaracion -> IF NUMERO igual_igual NUMERO Dos_puntos declaraciones .)
-    VARIABLE        reduce using rule 11 (declaracion -> IF NUMERO igual_igual NUMERO Dos_puntos declaraciones .)
-    DEF             reduce using rule 11 (declaracion -> IF NUMERO igual_igual NUMERO Dos_puntos declaraciones .)
-    $end            reduce using rule 11 (declaracion -> IF NUMERO igual_igual NUMERO Dos_puntos declaraciones .)
-
-
-state 75
-
-    (12) declaracion -> FOR VARIABLE IN RANGE Parentesis_apertura NUMERO . Parentesis_final Dos_puntos declaraciones
-
-    Parentesis_final shift and go to state 78
-
 
 state 76
 
-    (22) declaracion -> DEF VARIABLE Parentesis_apertura parametros Parentesis_final Dos_puntos . declaraciones
+    (12) declaracion -> FOR VARIABLE IN RANGE Parentesis_apertura NUMERO Parentesis_final . Dos_puntos declaraciones
+
+    Dos_puntos      shift and go to state 78
+
+
+state 77
+
+    (22) declaracion -> DEF VARIABLE Parentesis_apertura parametros Parentesis_final Dos_puntos declaraciones .
+
+    VAR             reduce using rule 22 (declaracion -> DEF VARIABLE Parentesis_apertura parametros Parentesis_final Dos_puntos declaraciones .)
+    IF              reduce using rule 22 (declaracion -> DEF VARIABLE Parentesis_apertura parametros Parentesis_final Dos_puntos declaraciones .)
+    FOR             reduce using rule 22 (declaracion -> DEF VARIABLE Parentesis_apertura parametros Parentesis_final Dos_puntos declaraciones .)
+    PRINT           reduce using rule 22 (declaracion -> DEF VARIABLE Parentesis_apertura parametros Parentesis_final Dos_puntos declaraciones .)
+    VARIABLE        reduce using rule 22 (declaracion -> DEF VARIABLE Parentesis_apertura parametros Parentesis_final Dos_puntos declaraciones .)
+    DEF             reduce using rule 22 (declaracion -> DEF VARIABLE Parentesis_apertura parametros Parentesis_final Dos_puntos declaraciones .)
+    $end            reduce using rule 22 (declaracion -> DEF VARIABLE Parentesis_apertura parametros Parentesis_final Dos_puntos declaraciones .)
+
+
+state 78
+
+    (12) declaracion -> FOR VARIABLE IN RANGE Parentesis_apertura NUMERO Parentesis_final Dos_puntos . declaraciones
     (1) declaraciones -> . declaracion declaraciones
     (2) declaraciones -> . declaracion
     (3) declaracion -> . VAR VARIABLE igual NUMERO Punto_y_coma
-    (4) declaracion -> . VAR VARIABLE igual COMILLA VARIABLE COMILLA Punto_y_coma
+    (4) declaracion -> . VAR VARIABLE igual expresion_parentesis Punto_y_coma
     (5) declaracion -> . VAR VARIABLE igual TRUE Punto_y_coma
     (6) declaracion -> . VAR VARIABLE igual FALSE Punto_y_coma
     (7) declaracion -> . IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones
@@ -984,71 +1054,7 @@ state 76
     declaraciones                  shift and go to state 79
     declaracion                    shift and go to state 2
 
-state 77
-
-    (4) declaracion -> VAR VARIABLE igual COMILLA VARIABLE COMILLA Punto_y_coma .
-
-    VAR             reduce using rule 4 (declaracion -> VAR VARIABLE igual COMILLA VARIABLE COMILLA Punto_y_coma .)
-    IF              reduce using rule 4 (declaracion -> VAR VARIABLE igual COMILLA VARIABLE COMILLA Punto_y_coma .)
-    FOR             reduce using rule 4 (declaracion -> VAR VARIABLE igual COMILLA VARIABLE COMILLA Punto_y_coma .)
-    PRINT           reduce using rule 4 (declaracion -> VAR VARIABLE igual COMILLA VARIABLE COMILLA Punto_y_coma .)
-    VARIABLE        reduce using rule 4 (declaracion -> VAR VARIABLE igual COMILLA VARIABLE COMILLA Punto_y_coma .)
-    DEF             reduce using rule 4 (declaracion -> VAR VARIABLE igual COMILLA VARIABLE COMILLA Punto_y_coma .)
-    $end            reduce using rule 4 (declaracion -> VAR VARIABLE igual COMILLA VARIABLE COMILLA Punto_y_coma .)
-
-
-state 78
-
-    (12) declaracion -> FOR VARIABLE IN RANGE Parentesis_apertura NUMERO Parentesis_final . Dos_puntos declaraciones
-
-    Dos_puntos      shift and go to state 80
-
-
 state 79
-
-    (22) declaracion -> DEF VARIABLE Parentesis_apertura parametros Parentesis_final Dos_puntos declaraciones .
-
-    VAR             reduce using rule 22 (declaracion -> DEF VARIABLE Parentesis_apertura parametros Parentesis_final Dos_puntos declaraciones .)
-    IF              reduce using rule 22 (declaracion -> DEF VARIABLE Parentesis_apertura parametros Parentesis_final Dos_puntos declaraciones .)
-    FOR             reduce using rule 22 (declaracion -> DEF VARIABLE Parentesis_apertura parametros Parentesis_final Dos_puntos declaraciones .)
-    PRINT           reduce using rule 22 (declaracion -> DEF VARIABLE Parentesis_apertura parametros Parentesis_final Dos_puntos declaraciones .)
-    VARIABLE        reduce using rule 22 (declaracion -> DEF VARIABLE Parentesis_apertura parametros Parentesis_final Dos_puntos declaraciones .)
-    DEF             reduce using rule 22 (declaracion -> DEF VARIABLE Parentesis_apertura parametros Parentesis_final Dos_puntos declaraciones .)
-    $end            reduce using rule 22 (declaracion -> DEF VARIABLE Parentesis_apertura parametros Parentesis_final Dos_puntos declaraciones .)
-
-
-state 80
-
-    (12) declaracion -> FOR VARIABLE IN RANGE Parentesis_apertura NUMERO Parentesis_final Dos_puntos . declaraciones
-    (1) declaraciones -> . declaracion declaraciones
-    (2) declaraciones -> . declaracion
-    (3) declaracion -> . VAR VARIABLE igual NUMERO Punto_y_coma
-    (4) declaracion -> . VAR VARIABLE igual COMILLA VARIABLE COMILLA Punto_y_coma
-    (5) declaracion -> . VAR VARIABLE igual TRUE Punto_y_coma
-    (6) declaracion -> . VAR VARIABLE igual FALSE Punto_y_coma
-    (7) declaracion -> . IF NUMERO Mayor_que NUMERO Dos_puntos declaraciones
-    (8) declaracion -> . IF NUMERO Menor_que NUMERO Dos_puntos declaraciones
-    (9) declaracion -> . IF NUMERO Menor_o_igual NUMERO Dos_puntos declaraciones
-    (10) declaracion -> . IF NUMERO Mayor_o_igual NUMERO Dos_puntos declaraciones
-    (11) declaracion -> . IF NUMERO igual_igual NUMERO Dos_puntos declaraciones
-    (12) declaracion -> . FOR VARIABLE IN RANGE Parentesis_apertura NUMERO Parentesis_final Dos_puntos declaraciones
-    (13) declaracion -> . PRINT Parentesis_apertura expresion_parentesis Parentesis_final Punto_y_coma
-    (20) declaracion -> . VARIABLE Parentesis_apertura Parentesis_final Punto_y_coma
-    (21) declaracion -> . VARIABLE Parentesis_apertura parametros Parentesis_final Punto_y_coma
-    (22) declaracion -> . DEF VARIABLE Parentesis_apertura parametros Parentesis_final Dos_puntos declaraciones
-    (23) declaracion -> . DEF VARIABLE Parentesis_apertura Parentesis_final Dos_puntos
-
-    VAR             shift and go to state 3
-    IF              shift and go to state 5
-    FOR             shift and go to state 6
-    PRINT           shift and go to state 7
-    VARIABLE        shift and go to state 4
-    DEF             shift and go to state 8
-
-    declaraciones                  shift and go to state 81
-    declaracion                    shift and go to state 2
-
-state 81
 
     (12) declaracion -> FOR VARIABLE IN RANGE Parentesis_apertura NUMERO Parentesis_final Dos_puntos declaraciones .
 
@@ -1069,3 +1075,4 @@ WARNING: shift/reduce conflict for FOR in state 2 resolved as shift
 WARNING: shift/reduce conflict for PRINT in state 2 resolved as shift
 WARNING: shift/reduce conflict for VARIABLE in state 2 resolved as shift
 WARNING: shift/reduce conflict for DEF in state 2 resolved as shift
+WARNING: shift/reduce conflict for Punto_y_coma in state 34 resolved as shift

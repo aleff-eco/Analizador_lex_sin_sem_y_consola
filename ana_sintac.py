@@ -15,11 +15,11 @@ def p_declaraciones(p):
 def p_declaracion(p):
     '''
     declaracion : VAR VARIABLE igual NUMERO Punto_y_coma 
-                | VAR VARIABLE igual COMILLA VARIABLE COMILLA Punto_y_coma 
+                | VAR VARIABLE igual expresion_parentesis Punto_y_coma 
                 | VAR VARIABLE igual TRUE Punto_y_coma 
                 | VAR VARIABLE igual FALSE Punto_y_coma 
     '''
-    p[0] = ('declaracion', p[1], p[2])
+    p[0] = ('Variable', p[2], p[4])
 
 #CONDICIONALES IF
 def p_condicional_if(p):
