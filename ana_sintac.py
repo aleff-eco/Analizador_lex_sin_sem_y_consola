@@ -14,10 +14,10 @@ def p_declaraciones(p):
 # VARIABLES
 def p_declaracion(p):
     '''
-    declaracion : VAR VARIABLE igual NUMERO Punto_y_coma
-                | VAR VARIABLE igual COMILLA VARIABLE COMILLA Punto_y_coma
-                | VAR VARIABLE igual TRUE Punto_y_coma
-                | VAR VARIABLE igual FALSE Punto_y_coma
+    declaracion : VAR VARIABLE igual NUMERO Punto_y_coma 
+                | VAR VARIABLE igual COMILLA VARIABLE COMILLA Punto_y_coma 
+                | VAR VARIABLE igual TRUE Punto_y_coma 
+                | VAR VARIABLE igual FALSE Punto_y_coma 
     '''
     p[0] = ('declaracion', p[1], p[2])
 
@@ -60,12 +60,15 @@ def p_expresion_parentesis(p):
 def p_variables(p):
     '''
     variables : VARIABLE
+              | NUMERO
               | variables VARIABLE
+              | variables NUMERO
     '''
     if len(p) == 2:
         p[0] = p[1]
     else:
         p[0] = f'{p[1]} {p[2]}'
+
     
 #FUNCIONES
 
